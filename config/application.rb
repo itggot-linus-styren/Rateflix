@@ -24,8 +24,8 @@ module Rateflix
 
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins '*'
-        resource '*', :headers => :any, :methods => [:get, :post, :put, :patch, :delete, :options]
+        origins 'http://rateflix.local:8080'
+        resource '*', :credentials => true, :headers => :any, :methods => [:get, :post, :put, :patch, :delete, :options]
       end
     end
 
