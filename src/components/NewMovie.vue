@@ -14,6 +14,7 @@
             p.text-danger(v-if="error.author != undefined") {{ error.author[0] }}
         .row
             button.btn.btn-primary(@click="newMovie") ADD
+            p.text-success(v-if="notice") {{ notice }}
 </template>
 
 <script lang="ts">
@@ -26,17 +27,25 @@ export default class NewMovies extends Vue {
         title : "",
         author_id : ""
     };
+    notice = "";
     error = {};
     
     created() {
-        this.axios.get("http://192.168.226.53:3000/authors.json").then((response)=>{
-            this.authors = response.data;
-        });
+        let that = this
+        let callback = ()=>{
+            that.axios.get("http://api-rateflix.local:3000/authors.json", {withCredentials: true}).then((response)=>{
+                that.authors = response.data;
+            });
+        }
+        this.$root.$on("added-author", callback);
+        callback();
     }
 
     newMovie() {
-        this.axios.post("http://192.168.226.53:3000/movies.json", this.query).then((response)=>{
-            console.log(response)
+        this.error = {};
+        this.notice = "";
+        this.axios.post("http://api-rateflix.local:3000/movies.json", this.query, {withCredentials: true}).then((response)=>{
+            this.notice = "Successfully created movie " + this.query.title + "!"
         }).catch((reason)=>{
             this.error = reason.response.data;
         })
