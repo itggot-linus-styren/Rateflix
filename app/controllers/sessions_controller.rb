@@ -2,23 +2,31 @@ class SessionsController < ApplicationController
   
   # GET /session
   def show
-    render plain: current_user&.id
+    render json: {:user_id => current_user&.id}
   end
 
   # POST /session
   def create
-    user = User.find_by_username(params[:name])
-    if user && user.authenticate(params[:password])
-      session[:user_id] = user.id
-      render json: "Logged in"
+    if current_user
+      render json: "User already logged in", :status => :unprocessable_entity
     else
-      render json: "Username or password is invalid"
+      user = User.find_by_username(params[:name])
+      if user && user.authenticate(params[:password])
+        session[:user_id] = user.id
+        render json: "Logged in"
+      else
+        render json: "Username or password is invalid", :status => :unprocessable_entity
+      end
     end
   end
 
   # DELETE /session
   def destroy
-    session[:user_id] = nil
-    render json: "Logged out"
+    if current_user
+      session[:user_id] = nil
+      render json: "Logged out"
+    else      
+      render json: "User not logged in", :status => :unprocessable_entity
+    end
   end
 end

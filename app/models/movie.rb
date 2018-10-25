@@ -1,6 +1,8 @@
 class Movie < ApplicationRecord
+  has_many :reviews
+  has_many :users, through: :reviews
+
   belongs_to :author
-  has_and_belongs_to_many :users
 
   validates :title, presence: true, uniqueness: true
   validates :author, presence: true
