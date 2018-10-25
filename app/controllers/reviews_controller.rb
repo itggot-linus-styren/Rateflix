@@ -43,7 +43,7 @@ class ReviewsController < ApplicationController
   def update
     respond_to do |format|
       if !current_user.id == @review.user.id
-        render json: "User does not own this review", status: :unprocessable_entity
+        render json: {error: "User does not own this review"}, status: :unprocessable_entity
       elsif @review.update(review_params)
         format.html { redirect_to @review, notice: 'Review was successfully updated.' }
         format.json { render :show, status: :ok, location: @review }
@@ -64,7 +64,7 @@ class ReviewsController < ApplicationController
         format.json { head :no_content }
       end
     else
-      render json: "User does not own this review", status: :unprocessable_entity
+      render json: {error: "User does not own this review"}, status: :unprocessable_entity
     end
   end
 
@@ -72,13 +72,7 @@ class ReviewsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_review
       @review = Review.find(params[:id])
-    end
-
-    def logged_in
-      unless current_user
-        render json: "User must be logged in to access this page", status: 403
-      end
-    end
+    end    
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def review_params

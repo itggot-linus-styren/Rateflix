@@ -8,14 +8,14 @@ class SessionsController < ApplicationController
   # POST /session
   def create
     if current_user
-      render json: "User already logged in", :status => :unprocessable_entity
+      render json: {error: "User already logged in"}, :status => :unprocessable_entity
     else
-      user = User.find_by_username(params[:name])
+      user = User.find_by_username(params[:username])
       if user && user.authenticate(params[:password])
         session[:user_id] = user.id
-        render json: "Logged in"
+        render json: {notice: "Logged in"}
       else
-        render json: "Username or password is invalid", :status => :unprocessable_entity
+        render json: {error: "Username or password is invalid"}, :status => :unprocessable_entity
       end
     end
   end
@@ -24,9 +24,9 @@ class SessionsController < ApplicationController
   def destroy
     if current_user
       session[:user_id] = nil
-      render json: "Logged out"
+      render json: {notice: "Logged out"}
     else      
-      render json: "User not logged in", :status => :unprocessable_entity
+      render json: {error: "User not logged in"}, :status => :unprocessable_entity
     end
   end
 end
