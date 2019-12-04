@@ -1,0 +1,74 @@
+schema.rb:# This file is auto-generated from the current state of the database. Instead
+schema.rb:# of editing this file, please use the migrations feature of Active Record to
+schema.rb:# incrementally modify your database, and then regenerate this schema definition.
+schema.rb:#
+schema.rb:# Note that this schema.rb definition is the authoritative source for your
+schema.rb:# database schema. If you need to create the application database on another
+schema.rb:# system, you should be using db:schema:load, not running all the migrations
+schema.rb:# from scratch. The latter is a flawed and unsustainable approach (the more migrations
+schema.rb:# you'll amass, the slower it'll run and the greater likelihood for issues).
+schema.rb:#
+schema.rb:# It's strongly recommended that you check this file into your version control system.
+schema.rb:
+schema.rb:ActiveRecord::Schema.define(version: 2018_10_25_075622) do
+schema.rb:
+schema.rb:  create_table "authors", force: :cascade do |t|
+schema.rb:    t.string "name"
+schema.rb:    t.datetime "created_at", null: false
+schema.rb:    t.datetime "updated_at", null: false
+schema.rb:  end
+schema.rb:
+schema.rb:  create_table "movies", force: :cascade do |t|
+schema.rb:    t.string "title"
+schema.rb:    t.integer "author_id"
+schema.rb:    t.datetime "created_at", null: false
+schema.rb:    t.datetime "updated_at", null: false
+schema.rb:    t.index ["author_id"], name: "index_movies_on_author_id"
+schema.rb:  end
+schema.rb:
+schema.rb:  create_table "reviews", force: :cascade do |t|
+schema.rb:    t.integer "user_id"
+schema.rb:    t.integer "movie_id"
+schema.rb:    t.integer "rating"
+schema.rb:    t.string "text"
+schema.rb:    t.datetime "created_at", null: false
+schema.rb:    t.datetime "updated_at", null: false
+schema.rb:    t.index ["movie_id"], name: "index_reviews_on_movie_id"
+schema.rb:    t.index ["user_id"], name: "index_reviews_on_user_id"
+schema.rb:  end
+schema.rb:
+schema.rb:  create_table "users", force: :cascade do |t|
+schema.rb:    t.string "username"
+schema.rb:    t.string "password_digest"
+schema.rb:    t.datetime "created_at", null: false
+schema.rb:    t.datetime "updated_at", null: false
+schema.rb:    t.index ["username"], name: "index_users_on_username", unique: true
+schema.rb:  end
+schema.rb:
+schema.rb:end
+20181023085458_create_authors.rb
+20181023085555_create_movies.rb
+20181023123845_create_join_table_user_movie.rb
+20181024083151_drop_users_table.rb
+20181024083457_create_users.rb
+20181025072530_drop_movies_users_table.rb
+20181025073413_add_rating_to_reviews.rb
+20181025073546_add_text_to_reviews.rb
+20181025075524_drop_reviews_table.rb
+20181025075622_create_reviews.rb
+seeds.rb:# This file should contain all the record creation needed to seed the database with its default values.
+seeds.rb:# The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
+seeds.rb:#
+seeds.rb:# Examples:
+seeds.rb:#
+seeds.rb:#   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
+seeds.rb:#   Character.create(name: 'Luke', movie: movies.first)
+seeds.rb:
+seeds.rb:#
+seeds.rb:author = Author.create(name: "George Lucas")
+seeds.rb:movie = Movie.create(title: "Star wars", author: author)
+seeds.rb:movie2 = Movie.create(title: "Test film", author: author)
+seeds.rb:user = User.create(username: "test", password: "123")
+seeds.rb:review1 = Review.create(user: user, movie: movie, rating: 5, text: "test review 1")
+seeds.rb:review2 = Review.create(user: user, movie: movie2, rating: 5, text: "test review 2")
+seeds.rb:puts review2.errors.inspect

@@ -1,0 +1,433 @@
+./App.vue:<template lang="pug">
+./App.vue:  .jumbotron
+./App.vue:    router-view
+./App.vue:</template>
+./main.ts:import Vue from 'vue'
+./main.ts:import App from './App.vue'
+./main.ts:import router from './router'
+./main.ts:import BootstrapVue from 'bootstrap-vue';
+./main.ts:import axios from 'axios';
+./main.ts:import VueAxios from 'vue-axios';
+./main.ts:
+./main.ts:import 'bootstrap/dist/css/bootstrap.css';
+./main.ts:import 'bootstrap-vue/dist/bootstrap-vue.css';
+./main.ts:
+./main.ts:Vue.config.productionTip = false
+./main.ts:Vue.use(BootstrapVue);
+./main.ts:Vue.use(VueAxios, axios) // ajax requests
+./main.ts:
+./main.ts:
+./main.ts:new Vue({
+./main.ts:  router,
+./main.ts:  render: h => h(App)
+./main.ts:}).$mount('#app')
+./router.ts:import Vue from 'vue'
+./router.ts:import Router from 'vue-router'
+./router.ts:
+./router.ts:Vue.use(Router)
+./router.ts:
+./router.ts:export default new Router({
+./router.ts:  mode: 'history',
+./router.ts:  base: process.env.BASE_URL,
+./router.ts:  routes: [
+./router.ts:    {
+./router.ts:      path: '/',
+./router.ts:      name: 'home',
+./router.ts:      component: () => import('./views/Home.vue')
+./router.ts:    },
+./router.ts:    {
+./router.ts:      path: '/add',
+./router.ts:      name: 'add',
+./router.ts:      component: () => import('./views/Add.vue')
+./router.ts:    },
+./router.ts:    {
+./router.ts:      path: '/user',
+./router.ts:      name: 'user',
+./router.ts:      component: () => import('./views/User.vue')
+./router.ts:    }
+./router.ts:  ]
+./router.ts:})
+./shims-tsx.d.ts:import Vue, { VNode } from 'vue'
+./shims-tsx.d.ts:
+./shims-tsx.d.ts:declare global {
+./shims-tsx.d.ts:  namespace JSX {
+./shims-tsx.d.ts:    // tslint:disable no-empty-interface
+./shims-tsx.d.ts:    interface Element extends VNode {}
+./shims-tsx.d.ts:    // tslint:disable no-empty-interface
+./shims-tsx.d.ts:    interface ElementClass extends Vue {}
+./shims-tsx.d.ts:    interface IntrinsicElements {
+./shims-tsx.d.ts:      [elem: string]: any
+./shims-tsx.d.ts:    }
+./shims-tsx.d.ts:  }
+./shims-tsx.d.ts:}
+./components/Navbar.vue:<template lang="pug">
+./components/Navbar.vue:    ul(v-if="done")
+./components/Navbar.vue:        li(v-if="user.username")
+./components/Navbar.vue:            p Welcome {{ user.username }}!
+./components/Navbar.vue:        li
+./components/Navbar.vue:            b-link(to="/") Home
+./components/Navbar.vue:        li
+./components/Navbar.vue:            b-link(to="/user") User
+./components/Navbar.vue:        li
+./components/Navbar.vue:            b-link(to="/add") Add
+./components/Navbar.vue:        li(v-if="user.id")
+./components/Navbar.vue:            Logout(:user_id="user.id")
+./components/Navbar.vue:</template>
+./components/Navbar.vue:
+./components/Navbar.vue:<script lang="ts">
+./components/Navbar.vue:import { Component, Vue } from 'vue-property-decorator';
+./components/Navbar.vue:import Logout from '@/components/Logout.vue';
+./components/Navbar.vue:
+./components/Navbar.vue:@Component({
+./components/Navbar.vue:    components: {
+./components/Navbar.vue:        Logout
+./components/Navbar.vue:    }
+./components/Navbar.vue:})
+./components/Navbar.vue:export default class Navbar extends Vue {
+./components/Navbar.vue:    done = false;
+./components/Navbar.vue:    user = {
+./components/Navbar.vue:        id : null,
+./components/Navbar.vue:        username : ""
+./components/Navbar.vue:    };
+./components/Navbar.vue:
+./components/Navbar.vue:
+./components/Navbar.vue:    created() {
+./components/Navbar.vue:        this.axios.get("http://localhost:3000/api/v1/session", {withCredentials: true}).then((response)=>{
+./components/Navbar.vue:            this.user.id = response.data.user_id;
+./components/Navbar.vue:            if (this.user.id) {
+./components/Navbar.vue:                this.axios.get(`http://localhost:3000/api/v1/users/${this.user.id}.json`, {withCredentials: true}).then((response)=>{
+./components/Navbar.vue:                    this.user.username = response.data.username;
+./components/Navbar.vue:                    this.done = true;
+./components/Navbar.vue:                })
+./components/Navbar.vue:            } else {
+./components/Navbar.vue:                this.done = true;
+./components/Navbar.vue:            }
+./components/Navbar.vue:        })
+./components/Navbar.vue:    }
+./components/Navbar.vue:}
+./components/Navbar.vue:</script>
+./components/Navbar.vue:
+./components/Navbar.vue:<style lang="sass">
+./components/Navbar.vue:ul
+./components/Navbar.vue:    list-style-type: none
+./components/Navbar.vue:</style>
+./components/NewAuthor.vue:<template lang="pug">
+./components/NewAuthor.vue:    .jumbotron
+./components/NewAuthor.vue:        .row
+./components/NewAuthor.vue:            h2.display-2 ADD A NEW AUTHOR
+./components/NewAuthor.vue:        .row 
+./components/NewAuthor.vue:            label(for="authorname") Author Name:
+./components/NewAuthor.vue:            input#authorname(placeholder="Author name..." type="text" v-model="query.name")
+./components/NewAuthor.vue:            p.text-danger(v-if="error.name != undefined") {{ error.name[0] }}
+./components/NewAuthor.vue:            p.text-success(v-if="notice") {{ notice }}
+./components/NewAuthor.vue:        .row
+./components/NewAuthor.vue:            button.btn.btn-primary(@click="newAuthor") ADD
+./components/NewAuthor.vue:            
+./components/NewAuthor.vue:</template>
+./components/NewAuthor.vue:
+./components/NewAuthor.vue:<script lang="ts">
+./components/NewAuthor.vue:import { Component, Vue } from 'vue-property-decorator';
+./components/NewAuthor.vue:
+./components/NewAuthor.vue:@Component
+./components/NewAuthor.vue:export default class NewAuthors extends Vue {
+./components/NewAuthor.vue:    error = {}
+./components/NewAuthor.vue:    notice = "";
+./components/NewAuthor.vue:    query = {
+./components/NewAuthor.vue:        name : ""
+./components/NewAuthor.vue:    }
+./components/NewAuthor.vue:
+./components/NewAuthor.vue:    newAuthor() {
+./components/NewAuthor.vue:        this.error = {};
+./components/NewAuthor.vue:        this.notice = "";
+./components/NewAuthor.vue:        this.axios.post("http://localhost:3000/api/v1/authors.json", this.query, {withCredentials: true}).then((response)=>{
+./components/NewAuthor.vue:            this.notice = "Successfully created author " + this.query.name + "!"
+./components/NewAuthor.vue:            this.$root.$emit("added-author");
+./components/NewAuthor.vue:        }).catch((reason)=>{
+./components/NewAuthor.vue:            this.error = reason.response.data;
+./components/NewAuthor.vue:        })
+./components/NewAuthor.vue:    }
+./components/NewAuthor.vue:}
+./components/NewAuthor.vue:</script>
+./components/Login.vue:<template lang="pug">
+./components/Login.vue:    .jumbotron
+./components/Login.vue:        .row
+./components/Login.vue:            h2.display-2 LOGIN
+./components/Login.vue:        .row
+./components/Login.vue:            label(for="username") Username:
+./components/Login.vue:            input#username(placeholder="username" type="text" v-model="query.username")
+./components/Login.vue:        .row
+./components/Login.vue:            label(for="password") password:
+./components/Login.vue:            input#password(placeholder="password" type="password" v-model="query.password")
+./components/Login.vue:        .row
+./components/Login.vue:            button.btn.btn-primary(@click="login") LOGIN
+./components/Login.vue:            p(v-if="error != {}") {{ error.error }}
+./components/Login.vue:</template>
+./components/Login.vue:
+./components/Login.vue:<script lang="ts">
+./components/Login.vue:import { Component, Vue } from 'vue-property-decorator';
+./components/Login.vue:
+./components/Login.vue:@Component
+./components/Login.vue:export default class User extends Vue {
+./components/Login.vue:    query = {
+./components/Login.vue:        username : "",
+./components/Login.vue:        password : ""
+./components/Login.vue:    };
+./components/Login.vue:    error = {};
+./components/Login.vue:
+./components/Login.vue:    login() {
+./components/Login.vue:        this.axios.post("http://localhost:3000/api/v1/session", this.query, {withCredentials: true}).then(()=>{
+./components/Login.vue:            this.$router.push("/")
+./components/Login.vue:        }).catch((reason)=>{
+./components/Login.vue:            this.error = reason.response.data;
+./components/Login.vue:        })
+./components/Login.vue:    }
+./components/Login.vue:}
+./components/Login.vue:</script>
+./components/Register.vue:<template lang="pug">
+./components/Register.vue:    .jumbotron
+./components/Register.vue:        .row
+./components/Register.vue:            h2.display-2 REGISTER
+./components/Register.vue:        .row
+./components/Register.vue:            label(for="reg-username") Username:
+./components/Register.vue:            input#reg-username(placeholder="username" type="text" v-model="query.user.username")
+./components/Register.vue:            p(v-if="error.username != undefined") {{ error.username[0] }}
+./components/Register.vue:        .row
+./components/Register.vue:            label(for="reg-password") password:
+./components/Register.vue:            input#reg-password(placeholder="password" type="password" v-model="query.user.password")
+./components/Register.vue:            p(v-if="error.password != undefined") {{ error.password[0] }}
+./components/Register.vue:        .row
+./components/Register.vue:            label(for="reg-password-conf") password confirmation:
+./components/Register.vue:            input#reg-password-conf(placeholder="confirm password" type="password" v-model="query.user.password_confirmation")
+./components/Register.vue:            p(v-if="error.password_confirmation != undefined") {{ error.password_confirmation[0] }}
+./components/Register.vue:        .row
+./components/Register.vue:            button.btn.btn-primary(@click="login") REGISTER
+./components/Register.vue:            p(v-if="error.error != ''") {{ error.error }}
+./components/Register.vue:</template>
+./components/Register.vue:
+./components/Register.vue:<script lang="ts">
+./components/Register.vue:import { Component, Vue } from 'vue-property-decorator';
+./components/Register.vue:
+./components/Register.vue:@Component
+./components/Register.vue:export default class User extends Vue {
+./components/Register.vue:    query = {
+./components/Register.vue:        user: {
+./components/Register.vue:            username : "",
+./components/Register.vue:            password : "",
+./components/Register.vue:            password_confirmation : ""
+./components/Register.vue:        }
+./components/Register.vue:    };
+./components/Register.vue:    error = {};
+./components/Register.vue:
+./components/Register.vue:    login() {
+./components/Register.vue:        this.axios.post("http://localhost:3000/api/v1/users.json", this.query, {withCredentials: true}).then((response)=>{
+./components/Register.vue:            this.axios.post("http://localhost:3000/api/v1/session", this.query.user, {withCredentials: true}).then(()=>{
+./components/Register.vue:                this.$router.push("/")
+./components/Register.vue:            })
+./components/Register.vue:        }).catch((reason)=>{
+./components/Register.vue:            this.error = reason.response.data;
+./components/Register.vue:        })
+./components/Register.vue:    }
+./components/Register.vue:}
+./components/Register.vue:</script>
+./components/Logout.vue:<template lang="pug">
+./components/Logout.vue:    div
+./components/Logout.vue:        b-button(@click="logout") LOGOUT
+./components/Logout.vue:        p(v-if="error != ''") {{ error }}
+./components/Logout.vue:</template>
+./components/Logout.vue:
+./components/Logout.vue:<script lang="ts">
+./components/Logout.vue:import { Component, Vue } from 'vue-property-decorator';
+./components/Logout.vue:
+./components/Logout.vue:@Component
+./components/Logout.vue:export default class User extends Vue {
+./components/Logout.vue:    error = "";
+./components/Logout.vue:
+./components/Logout.vue:    logout() {
+./components/Logout.vue:        this.axios.delete("http://localhost:3000/api/v1/session", {withCredentials: true}).then(()=>{
+./components/Logout.vue:            this.$router.push("/")
+./components/Logout.vue:        }).catch((reason)=>{
+./components/Logout.vue:            this.error = reason.response.data;
+./components/Logout.vue:        })
+./components/Logout.vue:    }
+./components/Logout.vue:}
+./components/Logout.vue:</script>
+./components/NewMovie.vue:<template lang="pug">
+./components/NewMovie.vue:    .jumbotron
+./components/NewMovie.vue:        .row
+./components/NewMovie.vue:            h2.display-2 ADD A NEW MOVIE
+./components/NewMovie.vue:        .row
+./components/NewMovie.vue:            label(for="moviename") Movie Name:
+./components/NewMovie.vue:            input#moviename(placeholder="Movie name..." type="text" v-model="query.title")
+./components/NewMovie.vue:            p.text-danger(v-if="error.title != undefined") {{ error.title[0] }}
+./components/NewMovie.vue:        .row
+./components/NewMovie.vue:            label(for="authername") Name of the Author:
+./components/NewMovie.vue:            select#authername(placeholder="Author name" type="text" v-model="query.author_id")
+./components/NewMovie.vue:                option(disabled) Author's name
+./components/NewMovie.vue:                option(v-for="(author, index) in authors" :value="author.id") {{ author.name }}
+./components/NewMovie.vue:            p.text-danger(v-if="error.author != undefined") {{ error.author[0] }}
+./components/NewMovie.vue:        .row
+./components/NewMovie.vue:            button.btn.btn-primary(@click="newMovie") ADD
+./components/NewMovie.vue:            p.text-success(v-if="notice") {{ notice }}
+./components/NewMovie.vue:</template>
+./components/NewMovie.vue:
+./components/NewMovie.vue:<script lang="ts">
+./components/NewMovie.vue:import { Component, Vue } from 'vue-property-decorator';
+./components/NewMovie.vue:
+./components/NewMovie.vue:@Component
+./components/NewMovie.vue:export default class NewMovies extends Vue {
+./components/NewMovie.vue:    authors = [];
+./components/NewMovie.vue:    query = {
+./components/NewMovie.vue:        title : "",
+./components/NewMovie.vue:        author_id : ""
+./components/NewMovie.vue:    };
+./components/NewMovie.vue:    notice = "";
+./components/NewMovie.vue:    error = {};
+./components/NewMovie.vue:    
+./components/NewMovie.vue:    created() {
+./components/NewMovie.vue:        let that = this
+./components/NewMovie.vue:        let callback = ()=>{
+./components/NewMovie.vue:            that.axios.get("http://localhost:3000/api/v1/authors.json", {withCredentials: true}).then((response)=>{
+./components/NewMovie.vue:                that.authors = response.data;
+./components/NewMovie.vue:            });
+./components/NewMovie.vue:        }
+./components/NewMovie.vue:        this.$root.$on("added-author", callback);
+./components/NewMovie.vue:        callback();
+./components/NewMovie.vue:    }
+./components/NewMovie.vue:
+./components/NewMovie.vue:    newMovie() {
+./components/NewMovie.vue:        this.error = {};
+./components/NewMovie.vue:        this.notice = "";
+./components/NewMovie.vue:        this.axios.post("http://localhost:3000/api/v1/movies.json", this.query, {withCredentials: true}).then((response)=>{
+./components/NewMovie.vue:            this.notice = "Successfully created movie " + this.query.title + "!"
+./components/NewMovie.vue:        }).catch((reason)=>{
+./components/NewMovie.vue:            this.error = reason.response.data;
+./components/NewMovie.vue:        })
+./components/NewMovie.vue:    }
+./components/NewMovie.vue:}
+./components/NewMovie.vue:</script>
+./components/MovieList.vue:<template lang="pug">
+./components/MovieList.vue:  .list-group
+./components/MovieList.vue:    .list-group-item(v-for="(movie, index) in movies" :key="index")
+./components/MovieList.vue:      | {{ movie.title }}
+./components/MovieList.vue:      b-form-input(type="range" min="1" max="10" v-model="movie.rating")
+./components/MovieList.vue:      b-form-input(type="text" v-model="movie.text" placeholder="Enter something")
+./components/MovieList.vue:      b-btn(@click="rate(movie)") RATE
+./components/MovieList.vue:
+./components/MovieList.vue:</template>
+./components/MovieList.vue:
+./components/MovieList.vue:<script lang="ts">
+./components/MovieList.vue:import { Component, Prop, Vue } from 'vue-property-decorator';
+./components/MovieList.vue:
+./components/MovieList.vue:@Component
+./components/MovieList.vue:export default class MovieList extends Vue {
+./components/MovieList.vue:  movies : any = [];
+./components/MovieList.vue:
+./components/MovieList.vue:  created() {
+./components/MovieList.vue:    this.axios.get("http://localhost:3000/api/v1/movies.json", {withCredentials: true}).then((response)=>{
+./components/MovieList.vue:      this.movies = response.data;
+./components/MovieList.vue:      this.movies = this.movies.map((m : any) => Object.assign(m, {rating: 5, text: "", updated: false}))
+./components/MovieList.vue:      this.axios.get("http://localhost:3000/api/v1/session", {withCredentials: true}).then((response)=>{
+./components/MovieList.vue:        let user_id = response.data.user_id;
+./components/MovieList.vue:        if (user_id) {
+./components/MovieList.vue:          this.axios.get("http://localhost:3000/api/v1/reviews.json", {withCredentials: true}).then((response)=>{
+./components/MovieList.vue:            this.movies = this.movies.map((m : any) => {
+./components/MovieList.vue:              let review = response.data.find((f : any) => f.user_id == user_id && f.movie_id == m.id)
+./components/MovieList.vue:              if (review) return Object.assign(m, {rating: review.rating, text: review.text, updated: review.id})
+./components/MovieList.vue:              return m
+./components/MovieList.vue:            })
+./components/MovieList.vue:          });
+./components/MovieList.vue:        }
+./components/MovieList.vue:      })
+./components/MovieList.vue:    });
+./components/MovieList.vue:  }
+./components/MovieList.vue:
+./components/MovieList.vue:  rate(movie : any) {
+./components/MovieList.vue:    let query = {
+./components/MovieList.vue:      movie_id: movie.id,
+./components/MovieList.vue:      rating: movie.rating,
+./components/MovieList.vue:      text: movie.text
+./components/MovieList.vue:    };
+./components/MovieList.vue:    if (movie.updated) this.axios.patch(`http://localhost:3000/api/v1/reviews/${movie.updated}.json`, query, {withCredentials: true})
+./components/MovieList.vue:    else this.axios.post("http://localhost:3000/api/v1/reviews.json", query, {withCredentials: true})
+./components/MovieList.vue:  }
+./components/MovieList.vue:  
+./components/MovieList.vue:}
+./components/MovieList.vue:</script>
+./views/Add.vue:<template lang="pug">
+./views/Add.vue:  div
+./views/Add.vue:    Navbar
+./views/Add.vue:    NewMovie
+./views/Add.vue:    NewAuthor
+./views/Add.vue:</template>
+./views/Add.vue:
+./views/Add.vue:<script lang="ts">
+./views/Add.vue:import { Component, Vue } from 'vue-property-decorator';
+./views/Add.vue:import Navbar from '@/components/Navbar.vue';
+./views/Add.vue:import NewMovie from '@/components/NewMovie.vue';
+./views/Add.vue:import NewAuthor from '@/components/NewAuthor.vue';
+./views/Add.vue:
+./views/Add.vue:@Component({
+./views/Add.vue:  components: {
+./views/Add.vue:    Navbar,
+./views/Add.vue:    NewMovie,
+./views/Add.vue:    NewAuthor
+./views/Add.vue:  }
+./views/Add.vue:})
+./views/Add.vue:export default class Add extends Vue {}
+./views/Add.vue:</script>
+./views/Home.vue:<template  lang="pug">
+./views/Home.vue:  div
+./views/Home.vue:    Navbar
+./views/Home.vue:    MovieList
+./views/Home.vue:</template>
+./views/Home.vue:
+./views/Home.vue:<script lang="ts">
+./views/Home.vue:import { Component, Vue } from 'vue-property-decorator';
+./views/Home.vue:import Navbar from '@/components/Navbar.vue';
+./views/Home.vue:import MovieList from '@/components/MovieList.vue';
+./views/Home.vue:
+./views/Home.vue:@Component({
+./views/Home.vue:  components: {
+./views/Home.vue:    Navbar,
+./views/Home.vue:    MovieList
+./views/Home.vue:  }
+./views/Home.vue:})
+./views/Home.vue:export default class Home extends Vue {
+./views/Home.vue:}
+./views/Home.vue:</script>
+./views/User.vue:<template lang="pug">
+./views/User.vue:    div(v-if="done")
+./views/User.vue:        Login(v-if="user_id == null")
+./views/User.vue:        Register(v-if="user_id == null")
+./views/User.vue:        Logout(v-if="user_id != null")
+./views/User.vue:</template>
+./views/User.vue:
+./views/User.vue:<script lang="ts">
+./views/User.vue:import { Component, Vue } from 'vue-property-decorator';
+./views/User.vue:import Login from '@/components/Login.vue';
+./views/User.vue:import Register from '@/components/Register.vue';
+./views/User.vue:import Logout from '@/components/Logout.vue';
+./views/User.vue:
+./views/User.vue:@Component({
+./views/User.vue:    components: {
+./views/User.vue:        Login,
+./views/User.vue:        Register,
+./views/User.vue:        Logout
+./views/User.vue:    }
+./views/User.vue:})
+./views/User.vue:export default class User extends Vue {
+./views/User.vue:    done = false;
+./views/User.vue:    user_id = null;
+./views/User.vue:
+./views/User.vue:    created() {
+./views/User.vue:        this.axios.get("http://localhost:3000/api/v1/session", {withCredentials: true}).then((response)=>{
+./views/User.vue:            this.user_id = response.data.user_id;
+./views/User.vue:            this.done = true;
+./views/User.vue:        })
+./views/User.vue:    }
+./views/User.vue:}
+./views/User.vue:</script>
+./shims-vue.d.ts:declare module '*.vue' {
+./shims-vue.d.ts:  import Vue from 'vue'
+./shims-vue.d.ts:  export default Vue
+./shims-vue.d.ts:}

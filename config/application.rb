@@ -22,12 +22,12 @@ module Rateflix
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
 
-    config.middleware.insert_before 0, Rack::Cors do
-      allow do
-        origins 'http://rateflix.local:8080'
-        resource '*', :credentials => true, :headers => :any, :methods => [:get, :post, :put, :patch, :delete, :options]
-      end
-    end
+    # config.middleware.insert_before 0, Rack::Cors do
+    #   allow do
+    #     origins 'http://rateflix.local:8080'
+    #     resource '*', :credentials => true, :headers => :any, :methods => [:get, :post, :put, :patch, :delete, :options]
+    #   end
+    # end
 
     config.action_controller.allow_forgery_protection = false
 

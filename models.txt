@@ -1,0 +1,30 @@
+./movie.rb:class Movie < ApplicationRecord
+./movie.rb:  has_many :reviews
+./movie.rb:  has_many :users, through: :reviews
+./movie.rb:
+./movie.rb:  belongs_to :author
+./movie.rb:
+./movie.rb:  validates :title, presence: true, uniqueness: { case_sensitive: false }
+./movie.rb:  validates :author, presence: true
+./movie.rb:end
+./author.rb:class Author < ApplicationRecord
+./author.rb:    validates :name, presence: true, uniqueness: { case_sensitive: false }
+./author.rb:end
+./review.rb:class Review < ApplicationRecord
+./review.rb:  belongs_to :user
+./review.rb:  belongs_to :movie
+./review.rb:
+./review.rb:  validates :rating, numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 10 }
+./review.rb:  validates_uniqueness_of :user_id, :scope => :movie_id
+./review.rb:end
+./application_record.rb:class ApplicationRecord < ActiveRecord::Base
+./application_record.rb:  self.abstract_class = true
+./application_record.rb:end
+./user.rb:class User < ApplicationRecord
+./user.rb:  has_many :reviews
+./user.rb:  has_many :movies, through: :reviews
+./user.rb:
+./user.rb:  has_secure_password
+./user.rb:
+./user.rb:  validates :username, presence: true, uniqueness: { case_sensitive: false }
+./user.rb:end

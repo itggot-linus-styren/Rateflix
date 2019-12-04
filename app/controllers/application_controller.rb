@@ -2,6 +2,12 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
   helper_method :logged_in
 
+  include ReverseProxy::Controller
+
+  def show
+    reverse_proxy "http://localhost:8080"
+  end
+
   def current_user
     if session[:user_id]
       @current_user ||= User.find(session[:user_id])

@@ -1,0 +1,397 @@
+./application_controller.rb:class ApplicationController < ActionController::Base
+./application_controller.rb:  helper_method :current_user
+./application_controller.rb:  helper_method :logged_in
+./application_controller.rb:
+./application_controller.rb:  include ReverseProxy::Controller
+./application_controller.rb:
+./application_controller.rb:  def show
+./application_controller.rb:    reverse_proxy "http://localhost:8080"
+./application_controller.rb:  end
+./application_controller.rb:
+./application_controller.rb:  def current_user
+./application_controller.rb:    if session[:user_id]
+./application_controller.rb:      @current_user ||= User.find(session[:user_id])
+./application_controller.rb:    else
+./application_controller.rb:      @current_user = nil
+./application_controller.rb:    end
+./application_controller.rb:  end
+./application_controller.rb:
+./application_controller.rb:  def logged_in
+./application_controller.rb:    unless current_user
+./application_controller.rb:      render json: {:error => "User must be logged in to access this page"}, status: 403
+./application_controller.rb:    end
+./application_controller.rb:  end
+./application_controller.rb:end
+./api/v1/movies_controller.rb:class Api::V1::MoviesController < ActionController::API
+./api/v1/movies_controller.rb:  before_action :set_movie, only: [:show, :edit, :update, :destroy]
+./api/v1/movies_controller.rb:  before_action :logged_in, only: [:new, :edit, :create, :update, :destroy]
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  # GET /movies
+./api/v1/movies_controller.rb:  # GET /movies.json
+./api/v1/movies_controller.rb:  def index
+./api/v1/movies_controller.rb:    @movies = Movie.all
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:    # respond_to do |format|
+./api/v1/movies_controller.rb:    #   format.html { render :index }
+./api/v1/movies_controller.rb:    #   format.json { render json: @movies }
+./api/v1/movies_controller.rb:    # end
+./api/v1/movies_controller.rb:    render json: @movies
+./api/v1/movies_controller.rb:  end
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  # GET /movies/1
+./api/v1/movies_controller.rb:  # GET /movies/1.json
+./api/v1/movies_controller.rb:  def show
+./api/v1/movies_controller.rb:    # respond_to do |format|
+./api/v1/movies_controller.rb:    #   format.html { render :index }
+./api/v1/movies_controller.rb:    #   format.json { render json: @movie }
+./api/v1/movies_controller.rb:    # end
+./api/v1/movies_controller.rb:  end
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  # GET /movies/new
+./api/v1/movies_controller.rb:  def new
+./api/v1/movies_controller.rb:    @movie = Movie.new
+./api/v1/movies_controller.rb:  end
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  # GET /movies/1/edit
+./api/v1/movies_controller.rb:  def edit
+./api/v1/movies_controller.rb:  end
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  # POST /movies
+./api/v1/movies_controller.rb:  # POST /movies.json
+./api/v1/movies_controller.rb:  def create
+./api/v1/movies_controller.rb:    @movie = Movie.new(movie_params)
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:    respond_to do |format|
+./api/v1/movies_controller.rb:      if @movie.save
+./api/v1/movies_controller.rb:        format.html { redirect_to @movie, notice: 'Movie was successfully created.' }
+./api/v1/movies_controller.rb:        format.json { render :show, status: :created, location: @movie }
+./api/v1/movies_controller.rb:      else
+./api/v1/movies_controller.rb:        format.html { render :new }
+./api/v1/movies_controller.rb:        format.json { render json: @movie.errors, status: :unprocessable_entity }
+./api/v1/movies_controller.rb:      end
+./api/v1/movies_controller.rb:    end
+./api/v1/movies_controller.rb:  end
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  # PATCH/PUT /movies/1
+./api/v1/movies_controller.rb:  # PATCH/PUT /movies/1.json
+./api/v1/movies_controller.rb:  def update
+./api/v1/movies_controller.rb:    respond_to do |format|
+./api/v1/movies_controller.rb:      if @movie.update(movie_params)
+./api/v1/movies_controller.rb:        format.html { redirect_to @movie, notice: 'Movie was successfully updated.' }
+./api/v1/movies_controller.rb:        format.json { render :show, status: :ok, location: @movie }
+./api/v1/movies_controller.rb:      else
+./api/v1/movies_controller.rb:        format.html { render :edit }
+./api/v1/movies_controller.rb:        format.json { render json: @movie.errors, status: :unprocessable_entity }
+./api/v1/movies_controller.rb:      end
+./api/v1/movies_controller.rb:    end
+./api/v1/movies_controller.rb:  end
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  # DELETE /movies/1
+./api/v1/movies_controller.rb:  # DELETE /movies/1.json
+./api/v1/movies_controller.rb:  def destroy
+./api/v1/movies_controller.rb:    @movie.destroy
+./api/v1/movies_controller.rb:    respond_to do |format|
+./api/v1/movies_controller.rb:      format.html { redirect_to movies_url, notice: 'Movie was successfully destroyed.' }
+./api/v1/movies_controller.rb:      format.json { head :no_content }
+./api/v1/movies_controller.rb:    end
+./api/v1/movies_controller.rb:  end
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  # PUT /movies/1/users/1
+./api/v1/movies_controller.rb:  # DESTROY /movies/1/users/1
+./api/v1/movies_controller.rb:  # def users
+./api/v1/movies_controller.rb:  #   if request.get?
+./api/v1/movies_controller.rb:  #     @movie = Movie.find(params[:movie_id])
+./api/v1/movies_controller.rb:  #     render json: @movie.users  
+./api/v1/movies_controller.rb:  #   else
+./api/v1/movies_controller.rb:  #     @movie = Movie.find(params[:movie_id])
+./api/v1/movies_controller.rb:  #     @user = User.find(params[:id])
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  #     if request.put?
+./api/v1/movies_controller.rb:  #       @movie.users << @user
+./api/v1/movies_controller.rb:  #     elsif request.delete?
+./api/v1/movies_controller.rb:  #       @movie.users.destroy @user
+./api/v1/movies_controller.rb:  #     end
+./api/v1/movies_controller.rb:  #   end
+./api/v1/movies_controller.rb:  # end
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:  private
+./api/v1/movies_controller.rb:    # Use callbacks to share common setup or constraints between actions.
+./api/v1/movies_controller.rb:    def set_movie
+./api/v1/movies_controller.rb:      @movie = Movie.find(params[:id])
+./api/v1/movies_controller.rb:    end
+./api/v1/movies_controller.rb:
+./api/v1/movies_controller.rb:    # Never trust parameters from the scary internet, only allow the white list through.
+./api/v1/movies_controller.rb:    def movie_params
+./api/v1/movies_controller.rb:      params.require(:movie).permit(:title, :author_id)
+./api/v1/movies_controller.rb:    end
+./api/v1/movies_controller.rb:end
+./api/v1/users_controller.rb:class Api::V1::UsersController < ActionController::API
+./api/v1/users_controller.rb:  before_action :set_user, only: [:show, :edit, :update, :destroy]
+./api/v1/users_controller.rb:  before_action :logged_in, only: [:edit, :update, :destroy]
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:  # GET /users
+./api/v1/users_controller.rb:  # GET /users.json
+./api/v1/users_controller.rb:  def index
+./api/v1/users_controller.rb:    @users = User.all
+./api/v1/users_controller.rb:  end
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:  # GET /users/1
+./api/v1/users_controller.rb:  # GET /users/1.json
+./api/v1/users_controller.rb:  def show
+./api/v1/users_controller.rb:  end
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:  # GET /users/new
+./api/v1/users_controller.rb:  def new
+./api/v1/users_controller.rb:    @user = User.new
+./api/v1/users_controller.rb:  end
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:  # GET /users/1/edit
+./api/v1/users_controller.rb:  def edit
+./api/v1/users_controller.rb:  end
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:  # POST /users
+./api/v1/users_controller.rb:  # POST /users.json
+./api/v1/users_controller.rb:  def create
+./api/v1/users_controller.rb:    @user = User.new(user_params)
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:    respond_to do |format|
+./api/v1/users_controller.rb:      if @user.save
+./api/v1/users_controller.rb:        format.html { redirect_to @user, notice: 'User was successfully created.' }
+./api/v1/users_controller.rb:        format.json { render :show, status: :created, location: @user }
+./api/v1/users_controller.rb:      else
+./api/v1/users_controller.rb:        format.html { render :new }
+./api/v1/users_controller.rb:        format.json { render json: @user.errors, status: :unprocessable_entity }
+./api/v1/users_controller.rb:      end
+./api/v1/users_controller.rb:    end
+./api/v1/users_controller.rb:  end
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:  # PATCH/PUT /users/1
+./api/v1/users_controller.rb:  # PATCH/PUT /users/1.json
+./api/v1/users_controller.rb:  def update
+./api/v1/users_controller.rb:    respond_to do |format|
+./api/v1/users_controller.rb:      if !current_user.id == @user.id
+./api/v1/users_controller.rb:        render json: {error: "User does not match"}, status: :unprocessable_entity
+./api/v1/users_controller.rb:      elsif @user.update(user_params)
+./api/v1/users_controller.rb:        format.html { redirect_to @user, notice: 'User was successfully updated.' }
+./api/v1/users_controller.rb:        format.json { render :show, status: :ok, location: @user }
+./api/v1/users_controller.rb:      else
+./api/v1/users_controller.rb:        format.html { render :edit }
+./api/v1/users_controller.rb:        format.json { render json: @user.errors, status: :unprocessable_entity }
+./api/v1/users_controller.rb:      end
+./api/v1/users_controller.rb:    end
+./api/v1/users_controller.rb:  end
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:  # DELETE /users/1
+./api/v1/users_controller.rb:  # DELETE /users/1.json
+./api/v1/users_controller.rb:  def destroy
+./api/v1/users_controller.rb:    if current_user.id == @user.id
+./api/v1/users_controller.rb:      @user.destroy
+./api/v1/users_controller.rb:      respond_to do |format|
+./api/v1/users_controller.rb:        format.html { redirect_to users_url, notice: 'User was successfully destroyed.' }
+./api/v1/users_controller.rb:        format.json { head :no_content }
+./api/v1/users_controller.rb:      end
+./api/v1/users_controller.rb:    else
+./api/v1/users_controller.rb:      render json: {:error => "User does not match"}, status: :unprocessable_entity
+./api/v1/users_controller.rb:    end
+./api/v1/users_controller.rb:  end
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:  private
+./api/v1/users_controller.rb:    # Use callbacks to share common setup or constraints between actions.
+./api/v1/users_controller.rb:    def set_user
+./api/v1/users_controller.rb:      @user = User.find(params[:id])
+./api/v1/users_controller.rb:    end
+./api/v1/users_controller.rb:
+./api/v1/users_controller.rb:    # Never trust parameters from the scary internet, only allow the white list through.
+./api/v1/users_controller.rb:    def user_params
+./api/v1/users_controller.rb:      params.require(:user).permit(:username, :password, :password_confirmation)
+./api/v1/users_controller.rb:    end
+./api/v1/users_controller.rb:end
+./api/v1/sessions_controller.rb:class Api::V1::SessionsController < ActionController::API
+./api/v1/sessions_controller.rb:  
+./api/v1/sessions_controller.rb:  # GET /session
+./api/v1/sessions_controller.rb:  def show
+./api/v1/sessions_controller.rb:    render json: {:user_id => current_user&.id}
+./api/v1/sessions_controller.rb:  end
+./api/v1/sessions_controller.rb:
+./api/v1/sessions_controller.rb:  # POST /session
+./api/v1/sessions_controller.rb:  def create
+./api/v1/sessions_controller.rb:    if current_user
+./api/v1/sessions_controller.rb:      render json: {error: "User already logged in"}, :status => :unprocessable_entity
+./api/v1/sessions_controller.rb:    else
+./api/v1/sessions_controller.rb:      user = User.find_by_username(params[:username])
+./api/v1/sessions_controller.rb:      if user && user.authenticate(params[:password])
+./api/v1/sessions_controller.rb:        session[:user_id] = user.id
+./api/v1/sessions_controller.rb:        render json: {notice: "Logged in"}
+./api/v1/sessions_controller.rb:      else
+./api/v1/sessions_controller.rb:        render json: {error: "Username or password is invalid"}, :status => :unprocessable_entity
+./api/v1/sessions_controller.rb:      end
+./api/v1/sessions_controller.rb:    end
+./api/v1/sessions_controller.rb:  end
+./api/v1/sessions_controller.rb:
+./api/v1/sessions_controller.rb:  # DELETE /session
+./api/v1/sessions_controller.rb:  def destroy
+./api/v1/sessions_controller.rb:    if current_user
+./api/v1/sessions_controller.rb:      session[:user_id] = nil
+./api/v1/sessions_controller.rb:      render json: {notice: "Logged out"}
+./api/v1/sessions_controller.rb:    else      
+./api/v1/sessions_controller.rb:      render json: {error: "User not logged in"}, :status => :unprocessable_entity
+./api/v1/sessions_controller.rb:    end
+./api/v1/sessions_controller.rb:  end
+./api/v1/sessions_controller.rb:end
+./api/v1/authors_controller.rb:class Api::V1::AuthorsController < ActionController::API
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:  before_action :set_author, only: [:show, :edit, :update, :destroy]
+./api/v1/authors_controller.rb:  before_action :logged_in, only: [:new, :edit, :create, :update, :destroy]
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:  # GET /authors
+./api/v1/authors_controller.rb:  # GET /authors.json
+./api/v1/authors_controller.rb:  def index
+./api/v1/authors_controller.rb:    @authors = Author.all
+./api/v1/authors_controller.rb:  end
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:  # GET /authors/1
+./api/v1/authors_controller.rb:  # GET /authors/1.json
+./api/v1/authors_controller.rb:  def show
+./api/v1/authors_controller.rb:  end
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:  # GET /authors/new
+./api/v1/authors_controller.rb:  def new
+./api/v1/authors_controller.rb:    @author = Author.new
+./api/v1/authors_controller.rb:  end
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:  # GET /authors/1/edit
+./api/v1/authors_controller.rb:  def edit
+./api/v1/authors_controller.rb:  end
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:  # POST /authors
+./api/v1/authors_controller.rb:  # POST /authors.json
+./api/v1/authors_controller.rb:  def create
+./api/v1/authors_controller.rb:    @author = Author.new(author_params)
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:    respond_to do |format|
+./api/v1/authors_controller.rb:      if @author.save
+./api/v1/authors_controller.rb:        format.html { redirect_to @author, notice: 'Author was successfully created.' }
+./api/v1/authors_controller.rb:        format.json { render :show, status: :created, location: @author }
+./api/v1/authors_controller.rb:      else
+./api/v1/authors_controller.rb:        format.html { render :new }
+./api/v1/authors_controller.rb:        format.json { render json: @author.errors, status: :unprocessable_entity }
+./api/v1/authors_controller.rb:      end
+./api/v1/authors_controller.rb:    end
+./api/v1/authors_controller.rb:  end
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:  # PATCH/PUT /authors/1
+./api/v1/authors_controller.rb:  # PATCH/PUT /authors/1.json
+./api/v1/authors_controller.rb:  def update
+./api/v1/authors_controller.rb:    respond_to do |format|
+./api/v1/authors_controller.rb:      if @author.update(author_params)
+./api/v1/authors_controller.rb:        format.html { redirect_to @author, notice: 'Author was successfully updated.' }
+./api/v1/authors_controller.rb:        format.json { render :show, status: :ok, location: @author }
+./api/v1/authors_controller.rb:      else
+./api/v1/authors_controller.rb:        format.html { render :edit }
+./api/v1/authors_controller.rb:        format.json { render json: @author.errors, status: :unprocessable_entity }
+./api/v1/authors_controller.rb:      end
+./api/v1/authors_controller.rb:    end
+./api/v1/authors_controller.rb:  end
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:  # DELETE /authors/1
+./api/v1/authors_controller.rb:  # DELETE /authors/1.json
+./api/v1/authors_controller.rb:  def destroy
+./api/v1/authors_controller.rb:    @author.destroy
+./api/v1/authors_controller.rb:    respond_to do |format|
+./api/v1/authors_controller.rb:      format.html { redirect_to authors_url, notice: 'Author was successfully destroyed.' }
+./api/v1/authors_controller.rb:      format.json { head :no_content }
+./api/v1/authors_controller.rb:    end
+./api/v1/authors_controller.rb:  end
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:  private
+./api/v1/authors_controller.rb:    # Use callbacks to share common setup or constraints between actions.
+./api/v1/authors_controller.rb:    def set_author
+./api/v1/authors_controller.rb:      @author = Author.find(params[:id])
+./api/v1/authors_controller.rb:    end
+./api/v1/authors_controller.rb:
+./api/v1/authors_controller.rb:    # Never trust parameters from the scary internet, only allow the white list through.
+./api/v1/authors_controller.rb:    def author_params
+./api/v1/authors_controller.rb:      params.require(:author).permit(:name)
+./api/v1/authors_controller.rb:    end
+./api/v1/authors_controller.rb:end
+./api/v1/reviews_controller.rb:class Api::V1::ReviewsController < ActionController::API
+./api/v1/reviews_controller.rb:  before_action :set_review, only: [:show, :edit, :update, :destroy]
+./api/v1/reviews_controller.rb:  before_action :logged_in, only: [:new, :edit, :create, :update, :destroy]
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:  # GET /reviews
+./api/v1/reviews_controller.rb:  # GET /reviews.json
+./api/v1/reviews_controller.rb:  def index
+./api/v1/reviews_controller.rb:    @reviews = Review.all
+./api/v1/reviews_controller.rb:  end
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:  # GET /reviews/1
+./api/v1/reviews_controller.rb:  # GET /reviews/1.json
+./api/v1/reviews_controller.rb:  def show
+./api/v1/reviews_controller.rb:  end
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:  # GET /reviews/new
+./api/v1/reviews_controller.rb:  def new
+./api/v1/reviews_controller.rb:    @review = Review.new
+./api/v1/reviews_controller.rb:  end
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:  # GET /reviews/1/edit
+./api/v1/reviews_controller.rb:  def edit
+./api/v1/reviews_controller.rb:  end
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:  # POST /reviews
+./api/v1/reviews_controller.rb:  # POST /reviews.json
+./api/v1/reviews_controller.rb:  def create
+./api/v1/reviews_controller.rb:    @review = Review.new(review_params.merge({:user_id => current_user.id}))
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:    respond_to do |format|
+./api/v1/reviews_controller.rb:      if @review.save
+./api/v1/reviews_controller.rb:        format.html { redirect_to @review, notice: 'Review was successfully created.' }
+./api/v1/reviews_controller.rb:        format.json { render :show, status: :created, location: @review }
+./api/v1/reviews_controller.rb:      else
+./api/v1/reviews_controller.rb:        format.html { render :new }
+./api/v1/reviews_controller.rb:        format.json { render json: @review.errors, status: :unprocessable_entity }
+./api/v1/reviews_controller.rb:      end
+./api/v1/reviews_controller.rb:    end
+./api/v1/reviews_controller.rb:  end
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:  # PATCH/PUT /reviews/1
+./api/v1/reviews_controller.rb:  # PATCH/PUT /reviews/1.json
+./api/v1/reviews_controller.rb:  def update
+./api/v1/reviews_controller.rb:    respond_to do |format|
+./api/v1/reviews_controller.rb:      if !current_user.id == @review.user.id
+./api/v1/reviews_controller.rb:        render json: {error: "User does not own this review"}, status: :unprocessable_entity
+./api/v1/reviews_controller.rb:      elsif @review.update(review_params)
+./api/v1/reviews_controller.rb:        format.html { redirect_to @review, notice: 'Review was successfully updated.' }
+./api/v1/reviews_controller.rb:        format.json { render :show, status: :ok, location: @review }
+./api/v1/reviews_controller.rb:      else
+./api/v1/reviews_controller.rb:        format.html { render :edit }
+./api/v1/reviews_controller.rb:        format.json { render json: @review.errors, status: :unprocessable_entity }
+./api/v1/reviews_controller.rb:      end
+./api/v1/reviews_controller.rb:    end
+./api/v1/reviews_controller.rb:  end
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:  # DELETE /reviews/1
+./api/v1/reviews_controller.rb:  # DELETE /reviews/1.json
+./api/v1/reviews_controller.rb:  def destroy
+./api/v1/reviews_controller.rb:    if current_user.id == @review.user.id
+./api/v1/reviews_controller.rb:      @review.destroy
+./api/v1/reviews_controller.rb:      respond_to do |format|
+./api/v1/reviews_controller.rb:        format.html { redirect_to reviews_url, notice: 'Review was successfully destroyed.' }
+./api/v1/reviews_controller.rb:        format.json { head :no_content }
+./api/v1/reviews_controller.rb:      end
+./api/v1/reviews_controller.rb:    else
+./api/v1/reviews_controller.rb:      render json: {error: "User does not own this review"}, status: :unprocessable_entity
+./api/v1/reviews_controller.rb:    end
+./api/v1/reviews_controller.rb:  end
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:  private
+./api/v1/reviews_controller.rb:    # Use callbacks to share common setup or constraints between actions.
+./api/v1/reviews_controller.rb:    def set_review
+./api/v1/reviews_controller.rb:      @review = Review.find(params[:id])
+./api/v1/reviews_controller.rb:    end    
+./api/v1/reviews_controller.rb:
+./api/v1/reviews_controller.rb:    # Never trust parameters from the scary internet, only allow the white list through.
+./api/v1/reviews_controller.rb:    def review_params
+./api/v1/reviews_controller.rb:      params.require(:review).permit(:movie_id, :rating, :text)
+./api/v1/reviews_controller.rb:    end
+./api/v1/reviews_controller.rb:end
